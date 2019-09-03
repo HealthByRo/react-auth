@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`processAuthResponse when clicks on "Set token data" button which set mocked token data auth data saved in localStorage match snapshot 1`] = `
+Object {
+  "tokenData": Object {
+    "expiredAt": "TEST_DATE_TIME",
+    "key": "TEST_TOKEN",
+    "status": "TEST_STATUS",
+  },
+}
+`;
+
+exports[`processAuthResponse when clicks on "Set token data" button which set mocked token data when clicks on "Set user data" button which set mocked user data auth data saved in localStorage match snapshot 1`] = `
+Object {
+  "lastTokens": Object {
+    "227abe90793934fc2588650db74319b7": "TEST_TOKEN",
+  },
+  "tokenData": Object {
+    "expiredAt": "TEST_DATE_TIME",
+    "key": "TEST_TOKEN",
+    "status": "TEST_STATUS",
+  },
+}
+`;
+
+exports[`processAuthResponse when clicks on "Set token data" button which set mocked token data when clicks on "Set user data" button which set mocked user data when clicks on "Set both: user and token data" button which set mocked token data and user data at the same time auth data saved in localStorage match snapshot 1`] = `
+Object {
+  "lastTokens": Object {
+    "227abe90793934fc2588650db74319b7": "TEST_TOKEN",
+    "f7e5d98e44426ec62dcc7119a9aa61fb": "TEST_TOKEN_UPDATED",
+  },
+  "tokenData": Object {
+    "expiredAt": "TEST_DATE_TIME_UPDATED",
+    "key": "TEST_TOKEN_UPDATED",
+    "status": "TEST_STATUS_UPDATED",
+  },
+}
+`;
+
+exports[`processAuthResponse when clicks on "Set token data" button which set mocked token data when clicks on "Set user data" button which set mocked user data when clicks on "Set token data" button which set null (it means user logout) auth data saved in localStorage match snapshot 1`] = `undefined`;
