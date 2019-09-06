@@ -13,9 +13,12 @@ import useAutoSignOut from './useAutoSignOut';
 import useSignOutSync from './useSignOutSync';
 import useSignOut from './useSignOut';
 import useAuthResponseCallback from './useAuthResponseCallback';
+import getAuthDataFromStorage from './utils/getAuthDataFromStorage';
+
+const tokenDataInLocalStorage = getAuthDataFromStorage();
 
 export default function AuthProvider(props) {
-  const [tokenData, setTokenData] = useState();
+  const [tokenData, setTokenData] = useState(tokenDataInLocalStorage);
   const [userData, setUserData] = useState();
 
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
@@ -25,11 +28,11 @@ export default function AuthProvider(props) {
 
   const [isReady] = useExtendTokenLifetime(tokenData, authResponseCallback, signOut);
 
-  useLocalStorageSync();
-  useApiClientSync();
+  useLocalStorageSync(tokenData, userData);
+  useApiClientSync(tokenData);
   useSignOutSync(userIsAuthenticated);
   useAutoSignOut(userIsAuthenticated, signOut);
-  useDebugValue(userIsAuthenticated ? 'Authenticaed' : 'Not authenticated');
+  useDebugValue(userIsAuthenticated ? 'Authenticated' : 'Not authenticated');
 
   return (
     <Context.Provider
