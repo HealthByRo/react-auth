@@ -67,11 +67,11 @@ describe('processAuthResponse', () => {
   });
 
   describe('when authResponseProcessor is not called', () => {
-    it('does not render anything inside section with test-dataid "tokenDataId"', () => {
+    it('does not render anything inside section with data-testid "tokenDataId"', () => {
       expect(container.getByTestId('tokenDataId').firstChild).toBeNull();
     });
 
-    it('does not render anything inside section with test-dataid "userDataId"', () => {
+    it('does not render anything inside section with data-testid "userDataId"', () => {
       expect(container.getByTestId('userDataId').firstChild).toBeNull();
     });
 
@@ -117,12 +117,12 @@ describe('processAuthResponse', () => {
       expect(authResponseProcessorInstances.size).toEqual(2);
     });
 
-    it('renders serialized tokenData from response inside section with test-dataid "tokenDataId"', () => {
+    it('renders serialized tokenData from response inside section with data-testid "tokenDataId"', () => {
       expect(container.getByTestId('tokenDataId').firstChild).not.toBeNull();
       expect(container.getByTestId('tokenDataId').firstChild).toMatchSnapshot();
     });
 
-    it('renders serialized userData from response inside section with test-dataid "userDataId"', () => {
+    it('renders serialized userData from response inside section with data-testid "userDataId"', () => {
       expect(container.getByTestId('userDataId').firstChild).not.toBeNull();
       expect(container.getByTestId('userDataId').firstChild).toMatchSnapshot();
     });

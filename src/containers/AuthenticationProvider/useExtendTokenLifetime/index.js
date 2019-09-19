@@ -5,6 +5,7 @@ import {
 import extendTokenLifetime from './extendTokenLifetime';
 import calculateExpiryTime from './utils/calculateExpiryTime';
 import isExpired from './utils/isExpired';
+import wait from './utils/wait';
 
 export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure) {
   const [isReady, setIsReady] = useState(false);
@@ -20,12 +21,16 @@ export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure) 
 
     const callExtendTokenLifetime = async () => {
       try {
-        const response = await extendTokenLifetime(tokenData.key);
-        const expiryTime = calculateExpiryTime(response.tokenData.expireAt);
+        if (tokenData) {
+          if (isReady) {
+            const expiryTime = calculateExpiryTime(tokenData.expireAt);
+            await wait(expiryTime);
+          }
 
-        onSuccess(response);
+          const response = await extendTokenLifetime(tokenData.key);
 
-        setTimeout(callExtendTokenLifetime, expiryTime);
+          onSuccess(response);
+        }
       } catch (error) {
         onFailure(error);
       } finally {

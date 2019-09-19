@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`processAuthResponse when clicks on "Set response data to authResponseProcessor" button which invoke authResponseProcessor(response) renders serialized tokenData from response inside section with test-dataid "tokenDataId" 1`] = `{"key":"TEST_TOKEN","status":"TEST_STATUS","expiredAt":"TEST_DATE_TIME"}`;
+exports[`processAuthResponse when clicks on "Set response data to authResponseProcessor" button which invoke authResponseProcessor(response) renders serialized tokenData from response inside section with data-testid "tokenDataId" 1`] = `{"key":"TEST_TOKEN","status":"TEST_STATUS","expiredAt":"TEST_DATE_TIME"}`;
 
-exports[`processAuthResponse when clicks on "Set response data to authResponseProcessor" button which invoke authResponseProcessor(response) renders serialized userData from response inside section with test-dataid "userDataId" 1`] = `{"id":"TEST_USER_ID","email":"TEST_USER_EMAIL"}`;
+exports[`processAuthResponse when clicks on "Set response data to authResponseProcessor" button which invoke authResponseProcessor(response) renders serialized userData from response inside section with data-testid "userDataId" 1`] = `{"id":"TEST_USER_ID","email":"TEST_USER_EMAIL"}`;
