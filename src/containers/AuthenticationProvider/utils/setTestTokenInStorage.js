@@ -1,7 +1,7 @@
 import setAuthDataInStorage from './setAuthDataInStorage';
 
-export const tokenDataInLocalStorage = {
+export const authDataInLocalStorage = {
   key: 'TOKEN_KEY',
 };
 
-setAuthDataInStorage(tokenDataInLocalStorage);
+setAuthDataInStorage(authDataInLocalStorage);

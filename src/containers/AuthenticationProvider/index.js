@@ -15,10 +15,10 @@ import useSignOut from './useSignOut';
 import useAuthResponseCallback from './useAuthResponseCallback';
 import getAuthDataFromStorage from './utils/getAuthDataFromStorage';
 
-const tokenDataInLocalStorage = getAuthDataFromStorage();
+const authDataInLocalStorage = getAuthDataFromStorage();
 
 export default function AuthProvider(props) {
-  const [tokenData, setTokenData] = useState(tokenDataInLocalStorage);
+  const [tokenData, setTokenData] = useState(authDataInLocalStorage && authDataInLocalStorage.tokenData);
   const [userData, setUserData] = useState();
 
   const userIsAuthenticated = isAuthenticated(tokenData, userData);

@@ -3,7 +3,7 @@ import {
   render,
   fireEvent,
 } from '@testing-library/react';
-import { tokenDataInLocalStorage } from './utils/setTestTokenInStorage';
+import { authDataInLocalStorage } from './utils/setTestTokenInStorage';
 import AuthProvider from '.';
 import Context from './context';
 import useExtendTokenLifetime from './useExtendTokenLifetime';
@@ -125,7 +125,7 @@ describe('<AuthProvider />', () => {
     it('calls useExtendTokenLifetime with tokenData, authResponseCallback, signOut', () => {
       container.rerender(<AuthProvider />);
 
-      expect(useExtendTokenLifetime).toHaveBeenCalledWith(tokenDataInLocalStorage, authResponseCallbackMock, expect.any(Function));
+      expect(useExtendTokenLifetime).toHaveBeenCalledWith(authDataInLocalStorage.tokenData, authResponseCallbackMock, expect.any(Function));
     });
 
     it('calls useApiClientSync hook on every render', () => {
@@ -149,7 +149,7 @@ describe('<AuthProvider />', () => {
     it('calls useAuthResponseCallback tokenData, userData, setTokenData and setUserData', () => {
       container.rerender(<AuthProvider />);
 
-      expect(useAuthResponseCallback).toHaveBeenCalledWith(tokenDataInLocalStorage, undefined, expect.any(Function), expect.any(Function));
+      expect(useAuthResponseCallback).toHaveBeenCalledWith(authDataInLocalStorage.tokenData, undefined, expect.any(Function), expect.any(Function));
     });
 
     it('calls useSignOutSync hook on every render', () => {
