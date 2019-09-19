@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import extendTokenLifetime from './extendTokenLifetime';
@@ -8,33 +9,42 @@ import isExpired from './utils/isExpired';
 import wait from './utils/wait';
 
 export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure) {
+  const processingRef = useRef(false);
+  const mountedRef = useRef(true);
+
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    let unmounted = false;
+    mountedRef.current = true;
 
     const switchToReady = () => {
-      if (!unmounted && !isReady) {
+      if (mountedRef.current && !isReady) {
         setIsReady(true);
       }
+
+      processingRef.current = false;
     };
 
     const callExtendTokenLifetime = async () => {
-      try {
-        if (tokenData) {
-          if (isReady) {
-            const expiryTime = calculateExpiryTime(tokenData.expireAt);
-            await wait(expiryTime);
+      if (!processingRef.current) {
+        processingRef.current = true;
+
+        try {
+          if (tokenData) {
+            if (isReady) {
+              const expiryTime = calculateExpiryTime(tokenData.expireAt);
+              await wait(expiryTime);
+            }
+
+            const response = await extendTokenLifetime(tokenData);
+
+            onSuccess(response);
           }
-
-          const response = await extendTokenLifetime(tokenData);
-
-          onSuccess(response);
+        } catch (error) {
+          onFailure(error);
+        } finally {
+          switchToReady();
         }
-      } catch (error) {
-        onFailure(error);
-      } finally {
-        switchToReady();
       }
     };
 
@@ -45,7 +55,7 @@ export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure) 
     }
 
     return () => {
-      unmounted = true;
+      mountedRef.current = false;
     };
   }, [tokenData]);
 

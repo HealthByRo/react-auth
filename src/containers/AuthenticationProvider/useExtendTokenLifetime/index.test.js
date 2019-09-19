@@ -87,6 +87,24 @@ describe('useExtendTokenLifetime', () => {
         expect(extendTokenLifetime).toHaveBeenCalledTimes(1);
       });
 
+      describe('when passed tokenData change during refreshing previous token data', () => {
+        beforeEach(async () => {
+          PASSED_TOKEN_DATA = { ...PASSED_TOKEN_DATA };
+
+          await act(async () => {
+            container.rerender(<TestComponent />);
+          });
+        });
+
+        it('calls extendTokenLifetime function once in case when passed token does not change', async () => {
+          await act(async () => {
+            container.rerender(<TestComponent />);
+          });
+
+          expect(extendTokenLifetime).toHaveBeenCalledTimes(1);
+        });
+      });
+
       describe('when component unmount', () => {
         it('does not set isReady flag in state when api request resolve', async (done) => {
           container.unmount();
