@@ -28,9 +28,15 @@ export default function AuthProvider(props) {
 
   const [isReady] = useExtendTokenLifetime(tokenData, authResponseCallback, signOut);
 
+
   useLocalStorageSync(tokenData, userData);
-  useApiClientSync(tokenData);
+
+  // order of hooks is important
+  // before removing auth token from apiClient using useApiClientSync
+  // useSignOutSync must send request to server, which requires auth token
   useSignOutSync(userIsAuthenticated);
+  useApiClientSync(tokenData);
+
   useAutoSignOut(userIsAuthenticated, signOut);
   useDebugValue(userIsAuthenticated ? 'Authenticated' : 'Not authenticated');
 
