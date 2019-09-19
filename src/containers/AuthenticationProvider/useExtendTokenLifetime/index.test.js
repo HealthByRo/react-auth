@@ -75,8 +75,8 @@ describe('useExtendTokenLifetime', () => {
         expect(container.queryByText('Is ready')).toBeNull();
       });
 
-      it('calls extendTokenLifetime immediately with PASSED_TOKEN_DATA.key', () => {
-        expect(extendTokenLifetime).toHaveBeenCalledWith(PASSED_TOKEN_DATA.key);
+      it('calls extendTokenLifetime immediately with PASSED_TOKEN_DATA', () => {
+        expect(extendTokenLifetime).toHaveBeenCalledWith(PASSED_TOKEN_DATA);
       });
 
       it('calls extendTokenLifetime function once in case when passed token does not change', async () => {

@@ -27,7 +27,7 @@ export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure) 
             await wait(expiryTime);
           }
 
-          const response = await extendTokenLifetime(tokenData.key);
+          const response = await extendTokenLifetime(tokenData);
 
           onSuccess(response);
         }
