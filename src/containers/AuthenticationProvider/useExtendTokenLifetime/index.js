@@ -48,8 +48,13 @@ export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure) 
       }
     };
 
-    if (tokenData && !isExpired(tokenData.expireAt)) {
-      callExtendTokenLifetime();
+    if (tokenData) {
+      if (isExpired(tokenData.expireAt)) {
+        onFailure();
+        switchToReady();
+      } else {
+        callExtendTokenLifetime();
+      }
     } else {
       switchToReady();
     }

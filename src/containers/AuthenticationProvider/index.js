@@ -28,7 +28,6 @@ export default function AuthProvider(props) {
 
   const [isReady] = useExtendTokenLifetime(tokenData, authResponseCallback, signOut);
 
-
   useLocalStorageSync(tokenData, userData);
 
   // order of hooks is important
