@@ -15,7 +15,10 @@ import cancelAutoSignOutTimer from './useAutoSignOut/utils/cancelTimer';
 import resetAutoSignOutTimer from './useAutoSignOut/utils/resetTimer';
 import runAutoSignOutTimer from './useAutoSignOut/utils/runTimer';
 import setLastActive from './useAutoSignOut/utils/setLastActive';
-import { TOKEN_STATUS_VALID } from './constants';
+import {
+  TOKEN_STATUS_VALID,
+  TOKEN_STATUS_AWAITING_SECOND_FACTOR,
+} from './constants';
 
 jest.mock('../../config', () => ({
   autoSignOutWithin: 1000,
@@ -36,6 +39,10 @@ describe('<AuthProvider />', () => {
     key: 'MOCK_TOKEN_KEY',
     status: TOKEN_STATUS_VALID,
   };
+  const mockAwaitingSecondFactorTokenData = {
+    key: 'MOCK_TOKEN_KEY',
+    status: TOKEN_STATUS_AWAITING_SECOND_FACTOR,
+  };
   const authResponseCallbackMock = () => {};
   let mockTokenData;
   let mockUserData;
@@ -50,6 +57,7 @@ describe('<AuthProvider />', () => {
           <Context.Consumer>
             {({
               isAuthenticated,
+              isAwaitingSecondFactor,
               isReady,
               setTokenData,
               setUserData,
@@ -60,6 +68,8 @@ describe('<AuthProvider />', () => {
                 {isReady === false && <section>Is not ready</section>}
                 {isAuthenticated === true && <section>Is authenticated</section>}
                 {isAuthenticated === false && <section>Is not authenticated</section>}
+                {isAwaitingSecondFactor === true && <section>Is awaiting second factor</section>}
+                {isAwaitingSecondFactor === false && <section>Is not awaiting second factor</section>}
                 <button
                   type="button"
                   onClick={() => setUserData(mockUserData)}
@@ -114,6 +124,14 @@ describe('<AuthProvider />', () => {
 
     it('does NOT render "Is authenticated" section', () => {
       expect(container.queryByText('Is authenticated')).toBeNull();
+    });
+
+    it('renders "Is not awaiting second factor" section', () => {
+      expect(container.queryByText('Is not awaiting second factor')).not.toBeNull();
+    });
+
+    it('does NOT render "Is awaiting second factor" section', () => {
+      expect(container.queryByText('Is awaiting second factor')).toBeNull();
     });
 
     it('calls useExtendTokenLifetime hook on every render', () => {
@@ -333,6 +351,24 @@ describe('<AuthProvider />', () => {
 
       it('does NOT render "Is authenticated" section', () => {
         expect(container.queryByText('Is authenticated')).toBeNull();
+      });
+    });
+
+    describe('token is awaiting second factor', () => {
+      beforeEach(() => {
+        mockTokenData = mockAwaitingSecondFactorTokenData;
+
+        const setTokenDataBtn = container.queryByText('Set token data');
+
+        fireEvent.click(setTokenDataBtn);
+      });
+
+      it('renders "Is awaiting second factor" section', () => {
+        expect(container.queryByText('Is awaiting second factor')).not.toBeNull();
+      });
+
+      it('does NOT render "Is not awaiting second factor" section', () => {
+        expect(container.queryByText('Is not awaiting second factor')).toBeNull();
       });
     });
   });
