@@ -19,19 +19,19 @@ jest.mock('../../../api', () => ({
   setAuthorizationTokenInHeaders: jest.fn(),
 }));
 
-let validToken = {
+const validToken = {
   key: 'valid_key',
   status: TOKEN_STATUS_VALID,
   expiredAt: 'mock_date',
 };
 
-let invalidToken = {
+const invalidToken = {
   key: 'invalid_key',
   status: TOKEN_STATUS_INVALID,
   expiredAt: 'mock_date',
 };
 
-let awaitingSecondFactorToken = {
+const awaitingSecondFactorToken = {
   key: 'awaiting_second_factor_key',
   status: TOKEN_STATUS_AWAITING_SECOND_FACTOR,
   expiredAt: 'mock_date',
