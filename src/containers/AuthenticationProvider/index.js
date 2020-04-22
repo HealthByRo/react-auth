@@ -21,6 +21,7 @@ const authDataInLocalStorage = getAuthDataFromStorage();
 export default function AuthProvider(props) {
   const [tokenData, setTokenData] = useState(authDataInLocalStorage && authDataInLocalStorage.tokenData);
   const [userData, setUserData] = useState();
+  const [userWasAutoSignedOut, setUserWasAutoSignedOut] = useState(false);
 
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
   const tokenIsAwaitingSecondFactor = isTokenAwaitingSecondFactor(tokenData);
@@ -38,7 +39,10 @@ export default function AuthProvider(props) {
   useSignOutSync(userIsAuthenticated);
   useApiClientSync(tokenData);
 
-  useAutoSignOut(userIsAuthenticated, signOut);
+  useAutoSignOut(userIsAuthenticated, () => {
+    setUserWasAutoSignedOut(true);
+    signOut();
+  });
   useDebugValue(userIsAuthenticated ? 'Authenticated' : 'Not authenticated');
 
   return (
@@ -52,6 +56,7 @@ export default function AuthProvider(props) {
         signOut,
         tokenData,
         userData,
+        userWasAutoSignedOut,
       }}
     >
       <div
