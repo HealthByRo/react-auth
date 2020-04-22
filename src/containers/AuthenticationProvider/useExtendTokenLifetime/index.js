@@ -1,46 +1,66 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import extendTokenLifetime from './extendTokenLifetime';
 import calculateExpiryTime from './utils/calculateExpiryTime';
 import isExpired from './utils/isExpired';
+import wait from './utils/wait';
 
 export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure) {
+  const processingRef = useRef(false);
+  const mountedRef = useRef(true);
+
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    let unmounted = false;
+    mountedRef.current = true;
 
     const switchToReady = () => {
-      if (!unmounted && !isReady) {
+      if (mountedRef.current && !isReady) {
         setIsReady(true);
       }
+
+      processingRef.current = false;
     };
 
     const callExtendTokenLifetime = async () => {
-      try {
-        const response = await extendTokenLifetime(tokenData.key);
-        const expiryTime = calculateExpiryTime(response.tokenData.expireAt);
+      if (!processingRef.current) {
+        processingRef.current = true;
 
-        onSuccess(response);
+        try {
+          if (tokenData) {
+            if (isReady) {
+              const expiryTime = calculateExpiryTime(tokenData.expireAt);
+              await wait(expiryTime);
+            }
 
-        setTimeout(callExtendTokenLifetime, expiryTime);
-      } catch (error) {
-        onFailure(error);
-      } finally {
-        switchToReady();
+            const response = await extendTokenLifetime(tokenData);
+
+            onSuccess(response);
+          }
+        } catch (error) {
+          onFailure(error);
+        } finally {
+          switchToReady();
+        }
       }
     };
 
-    if (tokenData && !isExpired(tokenData.expireAt)) {
-      callExtendTokenLifetime();
+    if (tokenData) {
+      if (isExpired(tokenData.expireAt)) {
+        onFailure();
+        switchToReady();
+      } else {
+        callExtendTokenLifetime();
+      }
     } else {
       switchToReady();
     }
 
     return () => {
-      unmounted = true;
+      mountedRef.current = false;
     };
   }, [tokenData]);
 

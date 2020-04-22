@@ -5,6 +5,7 @@ import React, {
 import PropTypes from 'prop-types';
 import Context from './context';
 import isAuthenticated from './utils/isAuthenticated';
+import isTokenAwaitingSecondFactor from './utils/isTokenAwaitingSecondFactor';
 import resetAutoSignOutTimer from './useAutoSignOut/utils/resetTimer';
 import useExtendTokenLifetime from './useExtendTokenLifetime';
 import useLocalStorageSync from './useLocalStorageSync';
@@ -15,13 +16,14 @@ import useSignOut from './useSignOut';
 import useAuthResponseCallback from './useAuthResponseCallback';
 import getAuthDataFromStorage from './utils/getAuthDataFromStorage';
 
-const tokenDataInLocalStorage = getAuthDataFromStorage();
+const authDataInLocalStorage = getAuthDataFromStorage();
 
 export default function AuthProvider(props) {
-  const [tokenData, setTokenData] = useState(tokenDataInLocalStorage);
+  const [tokenData, setTokenData] = useState(authDataInLocalStorage && authDataInLocalStorage.tokenData);
   const [userData, setUserData] = useState();
 
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
+  const tokenIsAwaitingSecondFactor = isTokenAwaitingSecondFactor(tokenData);
 
   const authResponseCallback = useAuthResponseCallback(tokenData, userData, setTokenData, setUserData);
   const signOut = useSignOut(setTokenData, setUserData);
@@ -29,8 +31,13 @@ export default function AuthProvider(props) {
   const [isReady] = useExtendTokenLifetime(tokenData, authResponseCallback, signOut);
 
   useLocalStorageSync(tokenData, userData);
-  useApiClientSync(tokenData);
+
+  // order of hooks is important
+  // before removing auth token from apiClient using useApiClientSync
+  // useSignOutSync must send request to server, which requires auth token
   useSignOutSync(userIsAuthenticated);
+  useApiClientSync(tokenData);
+
   useAutoSignOut(userIsAuthenticated, signOut);
   useDebugValue(userIsAuthenticated ? 'Authenticated' : 'Not authenticated');
 
@@ -38,6 +45,7 @@ export default function AuthProvider(props) {
     <Context.Provider
       value={{
         isAuthenticated: userIsAuthenticated,
+        isAwaitingSecondFactor: tokenIsAwaitingSecondFactor,
         isReady,
         setTokenData,
         setUserData,

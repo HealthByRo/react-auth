@@ -1,8 +1,9 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import MockDate from 'mockdate';
 import extendTokenLifetime from './extendTokenLifetime';
 import useExtendTokenLifetime from '.';
+import flushPromises from '../utils/flushPromises';
 
 jest.mock('./extendTokenLifetime', () => jest.fn());
 
@@ -56,12 +57,14 @@ describe('useExtendTokenLifetime', () => {
     describe('on initial render "isReady" flag is false', () => {
       let resolve;
 
-      beforeEach(() => {
+      beforeEach(async () => {
         extendTokenLifetime
           .mockReset()
           .mockImplementation(() => new Promise((_resolve) => { resolve = _resolve; }));
 
-        container = render(<TestComponent />);
+        await act(async () => {
+          container = render(<TestComponent />);
+        });
       });
 
       it('renders "Is not ready" section', () => {
@@ -72,34 +75,60 @@ describe('useExtendTokenLifetime', () => {
         expect(container.queryByText('Is ready')).toBeNull();
       });
 
-      it('calls extendTokenLifetime with PASSED_TOKEN_DATA.key', () => {
-        expect(extendTokenLifetime).toHaveBeenCalledWith(PASSED_TOKEN_DATA.key);
+      it('calls extendTokenLifetime immediately with PASSED_TOKEN_DATA', () => {
+        expect(extendTokenLifetime).toHaveBeenCalledWith(PASSED_TOKEN_DATA);
       });
 
-      it('calls extendTokenLifetime function once in case when passed token does not change', () => {
-        container.rerender(<TestComponent />);
+      it('calls extendTokenLifetime function once in case when passed token does not change', async () => {
+        await act(async () => {
+          container.rerender(<TestComponent />);
+        });
 
         expect(extendTokenLifetime).toHaveBeenCalledTimes(1);
+      });
+
+      describe('when passed tokenData change during refreshing previous token data', () => {
+        beforeEach(async () => {
+          PASSED_TOKEN_DATA = { ...PASSED_TOKEN_DATA };
+
+          await act(async () => {
+            container.rerender(<TestComponent />);
+          });
+        });
+
+        it('calls extendTokenLifetime function once in case when passed token does not change', async () => {
+          await act(async () => {
+            container.rerender(<TestComponent />);
+          });
+
+          expect(extendTokenLifetime).toHaveBeenCalledTimes(1);
+        });
       });
 
       describe('when component unmount', () => {
         it('does not set isReady flag in state when api request resolve', async (done) => {
           container.unmount();
-          resolve();
+
+          await act(async () => {
+            resolve(MOCK_RESPONSE);
+          });
+
           done();
         });
       });
     });
 
-    describe('when extendTokenLifetime fails "isReady" flag became true', () => {
-      beforeEach(() => {
+    describe('when extendTokenLifetime succeed "isReady" flag became true', () => {
+      beforeEach(async () => {
         onFailure.mockReset();
         onSuccess.mockReset();
         extendTokenLifetime
           .mockReset()
           .mockResolvedValue(MOCK_RESPONSE);
 
-        container = render(<TestComponent />);
+        await act(async () => {
+          container = render(<TestComponent />);
+        });
       });
 
       it('does NOT render "Is not ready" section', () => {
@@ -117,27 +146,21 @@ describe('useExtendTokenLifetime', () => {
       it('calls onSuccess function with response from extendTokenLifetime function', () => {
         expect(onSuccess).toHaveBeenCalledWith(MOCK_RESPONSE);
       });
-
-      it('calls extendTokenLifetime one more time before token expire', () => {
-        expect(extendTokenLifetime).toHaveBeenCalledTimes(1);
-
-        jest.advanceTimersByTime(UPDATED_TOKEN_EXPIRE_IN);
-
-        expect(extendTokenLifetime).toHaveBeenCalledTimes(2);
-      });
     });
 
-    describe('when extendTokenLifetime succeed "isReady" flag became true', () => {
+    describe('when extendTokenLifetime fails "isReady" flag became true', () => {
       const error = Error('SOME_ERROR');
 
-      beforeEach(() => {
+      beforeEach(async () => {
         onFailure.mockReset();
         onSuccess.mockReset();
         extendTokenLifetime
           .mockReset()
           .mockRejectedValue(error);
 
-        container = render(<TestComponent />);
+        await act(async () => {
+          container = render(<TestComponent />);
+        });
       });
 
       it('does NOT render "Is not ready" section', () => {
@@ -177,11 +200,14 @@ describe('useExtendTokenLifetime', () => {
     } = testCase;
 
     describe(description, () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         PASSED_TOKEN_DATA = tokenData;
 
         extendTokenLifetime.mockReset();
-        container = render(<TestComponent />);
+
+        await act(async () => {
+          container = render(<TestComponent />);
+        });
       });
 
       it('does not call extendTokenLifetime', () => {
@@ -196,11 +222,11 @@ describe('useExtendTokenLifetime', () => {
         expect(container.queryByText('Is ready')).not.toBeNull();
       });
 
-      describe('when passed tokenData become a valid token data', () => {
-        beforeEach(() => {
+      describe('when passed tokenData become a valid token data and "isReady" flag is true', () => {
+        beforeEach(async () => {
           PASSED_TOKEN_DATA = {
             key: 'INITIAL_TOKEN_KEY',
-            expireAt: new Date(NOW + 10 * 60 * 1000).toISOString(), // expired in 10 minutes,
+            expireAt: new Date(NOW + UPDATED_TOKEN_EXPIRE_IN).toISOString(), // expired in 10 minutes,
           };
 
           onSuccess.mockReset();
@@ -208,11 +234,18 @@ describe('useExtendTokenLifetime', () => {
             .mockReset()
             .mockResolvedValue(MOCK_RESPONSE);
 
-          container.rerender(<TestComponent />);
+          await act(async () => {
+            container.rerender(<TestComponent />);
+          });
         });
 
-        it('calls extendTokenLifetime', () => {
-          expect(extendTokenLifetime).toHaveBeenCalled();
+        it('wait with call extendTokenLifetime to expiration time of token, and extend it several seconds before expire', async () => {
+          expect(extendTokenLifetime).toHaveBeenCalledTimes(0);
+
+          jest.advanceTimersByTime(UPDATED_TOKEN_EXPIRE_IN);
+          await flushPromises();
+
+          expect(extendTokenLifetime).toHaveBeenCalledTimes(1);
         });
 
         it('does NOT render "Is not ready" section', () => {
@@ -221,14 +254,6 @@ describe('useExtendTokenLifetime', () => {
 
         it('renders "Is ready" section', () => {
           expect(container.queryByText('Is ready')).not.toBeNull();
-        });
-
-        it('calls extendTokenLifetime one more time before token expire', () => {
-          expect(extendTokenLifetime).toHaveBeenCalledTimes(1);
-
-          jest.advanceTimersByTime(UPDATED_TOKEN_EXPIRE_IN);
-
-          expect(extendTokenLifetime).toHaveBeenCalledTimes(2);
         });
       });
     });

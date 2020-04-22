@@ -74,14 +74,14 @@ describe('useSignOutSync', () => {
           fireEvent.click(buttonSetToTrue);
         });
 
-        it('calls signOut', () => {
-          expect(signOut).toHaveBeenCalled();
+        it('does not call signOut', () => {
+          expect(signOut).not.toHaveBeenCalled();
         });
 
-        it('does not call signOut on more time on re-render', () => {
+        it('does not call signOut on re-render', () => {
           container.rerender(<TestComponent />);
 
-          expect(signOut).toHaveBeenCalledTimes(1);
+          expect(signOut).toHaveBeenCalledTimes(0);
         });
 
         describe('when "isAuthenticated" flag switch to false', () => {
@@ -89,7 +89,7 @@ describe('useSignOutSync', () => {
             fireEvent.click(buttonSetToFalse);
           });
 
-          it('does not call signOut one more time', () => {
+          it('calls signOut', () => {
             expect(signOut).toHaveBeenCalledTimes(1);
           });
 

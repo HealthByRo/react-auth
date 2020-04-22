@@ -11,6 +11,7 @@
     "build": "rm -rf lib && npm run quick-build",
     "quick-build": "babel -d lib/ src/ --ignore \"**/*.test.js\",\"**/*.stories.js\"",
     "test": "jest --config=.jest.json --coverage",
+    "test-nc": "jest --config=.jest.json",
     "test:watch": "jest --config=.jest.json --no-cache --watchAll",
     "test:badge": "npm run test && node ./scripts/coverage.js",
     "lint": "npm run lint:js",
