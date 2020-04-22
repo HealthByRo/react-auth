@@ -111,7 +111,7 @@ describe('<AuthProvider />', () => {
     });
 
     it('renders "Is not ready" section', () => {
-      expect(container.queryByText('Is not ready')).not.toBeNull();
+      expect(container.queryByText('Is not ready')).toBeTruthy();
     });
 
     it('does NOT render "Is ready" section', () => {
@@ -119,7 +119,7 @@ describe('<AuthProvider />', () => {
     });
 
     it('renders "Is not authenticated" section', () => {
-      expect(container.queryByText('Is not authenticated')).not.toBeNull();
+      expect(container.queryByText('Is not authenticated')).toBeTruthy();
     });
 
     it('does NOT render "Is authenticated" section', () => {
@@ -127,7 +127,7 @@ describe('<AuthProvider />', () => {
     });
 
     it('renders "Is not awaiting second factor" section', () => {
-      expect(container.queryByText('Is not awaiting second factor')).not.toBeNull();
+      expect(container.queryByText('Is not awaiting second factor')).toBeTruthy();
     });
 
     it('does NOT render "Is awaiting second factor" section', () => {
@@ -192,7 +192,7 @@ describe('<AuthProvider />', () => {
       });
 
       it('renders "Is not authenticated" section', () => {
-        expect(container.queryByText('Is not authenticated')).not.toBeNull();
+        expect(container.queryByText('Is not authenticated')).toBeTruthy();
       });
 
       it('does NOT render "Is authenticated" section', () => {
@@ -218,7 +218,7 @@ describe('<AuthProvider />', () => {
         });
 
         it('renders "Is authenticated" section', () => {
-          expect(container.queryByText('Is authenticated')).not.toBeNull();
+          expect(container.queryByText('Is authenticated')).toBeTruthy();
         });
 
         it('calls setLastActive function when "isAuthenticated" turns from false to true', () => {
@@ -266,7 +266,7 @@ describe('<AuthProvider />', () => {
           });
 
           it('renders "Is not authenticated" section', () => {
-            expect(container.queryByText('Is not authenticated')).not.toBeNull();
+            expect(container.queryByText('Is not authenticated')).toBeTruthy();
           });
 
           it('does NOT render "Is authenticated" section', () => {
@@ -346,7 +346,7 @@ describe('<AuthProvider />', () => {
       });
 
       it('renders "Is not authenticated" section', () => {
-        expect(container.queryByText('Is not authenticated')).not.toBeNull();
+        expect(container.queryByText('Is not authenticated')).toBeTruthy();
       });
 
       it('does NOT render "Is authenticated" section', () => {
@@ -364,7 +364,7 @@ describe('<AuthProvider />', () => {
       });
 
       it('renders "Is awaiting second factor" section', () => {
-        expect(container.queryByText('Is awaiting second factor')).not.toBeNull();
+        expect(container.queryByText('Is awaiting second factor')).toBeTruthy();
       });
 
       it('does NOT render "Is not awaiting second factor" section', () => {
@@ -393,7 +393,7 @@ describe('<AuthProvider />', () => {
     });
 
     it('renders "Is ready" section', () => {
-      expect(container.queryByText('Is ready')).not.toBeNull();
+      expect(container.queryByText('Is ready')).toBeTruthy();
     });
 
     it('does NOT render "Is not ready" section', () => {
