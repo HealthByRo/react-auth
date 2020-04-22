@@ -5,6 +5,7 @@ import React, {
 import PropTypes from 'prop-types';
 import Context from './context';
 import isAuthenticated from './utils/isAuthenticated';
+import isTokenAwaitingSecondFactor from './utils/isTokenAwaitingSecondFactor';
 import resetAutoSignOutTimer from './useAutoSignOut/utils/resetTimer';
 import useExtendTokenLifetime from './useExtendTokenLifetime';
 import useLocalStorageSync from './useLocalStorageSync';
@@ -22,6 +23,7 @@ export default function AuthProvider(props) {
   const [userData, setUserData] = useState();
 
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
+  const tokenIsAwaitingSecondFactor = isTokenAwaitingSecondFactor(tokenData);
 
   const authResponseCallback = useAuthResponseCallback(tokenData, userData, setTokenData, setUserData);
   const signOut = useSignOut(setTokenData, setUserData);
@@ -43,6 +45,7 @@ export default function AuthProvider(props) {
     <Context.Provider
       value={{
         isAuthenticated: userIsAuthenticated,
+        isAwaitingSecondFactor: tokenIsAwaitingSecondFactor,
         isReady,
         setTokenData,
         setUserData,
