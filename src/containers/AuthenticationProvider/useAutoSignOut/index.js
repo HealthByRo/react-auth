@@ -8,7 +8,7 @@ export default function useAutoSignOut(isAuthenticated, signOut) {
   useEffect(() => {
     if (config.autoSignOutWithin) {
       if (isAuthenticated) {
-        setLastActive();
+        setLastActive(new Date().getTime());
         runAutoSignOutTimer(signOut);
       } else {
         cancelAutoSignOutTimer();
