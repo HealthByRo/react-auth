@@ -11,7 +11,7 @@ import useExtendTokenLifetime from './useExtendTokenLifetime';
 import useLocalStorageSync from './useLocalStorageSync';
 import useApiClientSync from './useApiClientSync';
 import useAutoSignOut from './useAutoSignOut';
-import useReceiveUserData from './useReceiveUserData';
+import useIsUserAuthenticated from './useIsUserAuthenticated';
 import useSignOutSync from './useSignOutSync';
 import useSignOut from './useSignOut';
 import useAuthResponseCallback from './useAuthResponseCallback';
@@ -32,7 +32,7 @@ export default function AuthProvider(props) {
 
   const [isReady] = useExtendTokenLifetime(tokenData, authResponseCallback, signOut);
 
-  useReceiveUserData(userData, () => {
+  useIsUserAuthenticated(userIsAuthenticated, () => {
     setUserWasAutoSignedOut(false);
   });
   useLocalStorageSync(tokenData, userData);
