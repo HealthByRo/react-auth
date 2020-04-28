@@ -33,16 +33,8 @@ describe('autoSignOut > resetTimer', () => {
       resetTimer();
     });
 
-    it('calls cancelTimer', () => {
-      expect(cancelTimer).toHaveBeenCalled();
-    });
-
     it('calls setLastActive', () => {
       expect(setLastActive).toHaveBeenCalled();
-    });
-
-    it('calls runTimer', () => {
-      expect(runTimer).toHaveBeenCalled();
     });
   });
 });

@@ -8,6 +8,7 @@ import AuthProvider from '.';
 import Context from './context';
 import useExtendTokenLifetime from './useExtendTokenLifetime';
 import useApiClientSync from './useApiClientSync';
+import useIsUserAuthenticated from './useIsUserAuthenticated';
 import useLocalStorageSync from './useLocalStorageSync';
 import useSignOutSync from './useSignOutSync';
 import useAuthResponseCallback from './useAuthResponseCallback';
@@ -26,6 +27,7 @@ jest.mock('../../config', () => ({
 
 jest.mock('./useExtendTokenLifetime', () => jest.fn());
 jest.mock('./useApiClientSync', () => jest.fn());
+jest.mock('./useIsUserAuthenticated', () => jest.fn());
 jest.mock('./useLocalStorageSync', () => jest.fn());
 jest.mock('./useSignOutSync', () => jest.fn());
 jest.mock('./useAuthResponseCallback', () => jest.fn());
@@ -62,6 +64,7 @@ describe('<AuthProvider />', () => {
               setTokenData,
               setUserData,
               signOut,
+              userWasAutoSignedOut,
             }) => (
               <>
                 {isReady === true && <section>Is ready</section>}
@@ -70,6 +73,7 @@ describe('<AuthProvider />', () => {
                 {isAuthenticated === false && <section>Is not authenticated</section>}
                 {isAwaitingSecondFactor === true && <section>Is awaiting second factor</section>}
                 {isAwaitingSecondFactor === false && <section>Is not awaiting second factor</section>}
+                {userWasAutoSignedOut === true && <section>User was auto signed out</section>}
                 <button
                   type="button"
                   onClick={() => setUserData(mockUserData)}
@@ -102,6 +106,7 @@ describe('<AuthProvider />', () => {
       useApiClientSync.mockReset();
       useAuthResponseCallback.mockReset().mockReturnValue(authResponseCallbackMock);
       useExtendTokenLifetime.mockReset();
+      useIsUserAuthenticated.mockReset();
       useLocalStorageSync.mockReset();
       useSignOutSync.mockReset();
     });
@@ -150,6 +155,12 @@ describe('<AuthProvider />', () => {
       container.rerender(<AuthProvider />);
 
       expect(useApiClientSync).toHaveBeenCalledTimes(2);
+    });
+
+    it('calls useIsUserAuthenticated hook on every render', () => {
+      container.rerender(<AuthProvider />);
+
+      expect(useIsUserAuthenticated).toHaveBeenCalledTimes(2);
     });
 
     it('calls useLocalStorageSync hook on every render', () => {
@@ -238,6 +249,11 @@ describe('<AuthProvider />', () => {
           container.unmount();
 
           expect(cancelAutoSignOutTimer).toHaveBeenCalledTimes(3);
+        });
+
+        it('calls useIsUserAuthenticated and sets userWasAutoSignedOut to false', () => {
+          expect(useIsUserAuthenticated).toHaveBeenCalledWith(true, expect.any(Function));
+          expect(container.queryByText('User was auto signed out')).toBeNull();
         });
 
         it('calls useLocalStorageSync with tokenData, userData', () => {
