@@ -30,20 +30,17 @@ export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure) 
         processingRef.current = true;
 
         try {
-          if (tokenData) {
-            if (isReady) {
-              const expiryTime = calculateExpiryTime(tokenData.expireAt);
-              await wait(expiryTime);
-            }
-
-            const response = await extendTokenLifetime(tokenData);
-
-            onSuccess(response);
+          if (isReady) {
+            const expiryTime = calculateExpiryTime(tokenData.expireAt);
+            await wait(expiryTime);
           }
-        } catch (error) {
-          onFailure(error);
-        } finally {
+
+          const response = await extendTokenLifetime(tokenData);
           switchToReady();
+          onSuccess(response);
+        } catch (error) {
+          switchToReady();
+          onFailure(error);
         }
       }
     };
