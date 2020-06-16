@@ -1,7 +1,4 @@
-import React, {
-  useState,
-  useDebugValue,
-} from 'react';
+import React, { useDebugValue } from 'react';
 import PropTypes from 'prop-types';
 import Context from './context';
 import isAuthenticated from './utils/isAuthenticated';
@@ -13,27 +10,25 @@ import useApiClientSync from './useApiClientSync';
 import useAutoSignOut from './useAutoSignOut';
 import useIsUserAuthenticated from './useIsUserAuthenticated';
 import useSignOutSync from './useSignOutSync';
-import useSignOut from './useSignOut';
-import useAuthResponseCallback from './useAuthResponseCallback';
-import getAuthDataFromStorage from './utils/getAuthDataFromStorage';
-
-const authDataInLocalStorage = getAuthDataFromStorage();
+import useAuthReducer from './useAuthReducer';
 
 export default function AuthProvider(props) {
-  const [tokenData, setTokenData] = useState(authDataInLocalStorage && authDataInLocalStorage.tokenData);
-  const [userData, setUserData] = useState();
-  const [userWasAutoSignedOut, setUserWasAutoSignedOut] = useState(false);
-
+  const [{
+    tokenData,
+    userData,
+    isReady,
+    userWasAutoSignedOut,
+  }, dispatch] = useAuthReducer();
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
   const tokenIsAwaitingSecondFactor = isTokenAwaitingSecondFactor(tokenData);
 
-  const authResponseCallback = useAuthResponseCallback(tokenData, userData, setTokenData, setUserData);
-  const signOut = useSignOut(setTokenData, setUserData);
-
-  const [isReady] = useExtendTokenLifetime(tokenData, authResponseCallback, signOut);
-
+  useExtendTokenLifetime(tokenData, (responseData) => {
+    dispatch({ type: 'setAuthData', ...responseData });
+  }, () => {
+    dispatch({ type: 'clearAuthData' });
+  }, isReady);
   useIsUserAuthenticated(userIsAuthenticated, () => {
-    setUserWasAutoSignedOut(false);
+    dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut: false });
   });
   useLocalStorageSync(tokenData, userData);
 
@@ -44,8 +39,8 @@ export default function AuthProvider(props) {
   useApiClientSync(tokenData);
 
   useAutoSignOut(userIsAuthenticated, () => {
-    setUserWasAutoSignedOut(true);
-    signOut();
+    dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut: true });
+    dispatch({ type: 'clearAuthData' });
   });
   useDebugValue(userIsAuthenticated ? 'Authenticated' : 'Not authenticated');
 
@@ -55,9 +50,10 @@ export default function AuthProvider(props) {
         isAuthenticated: userIsAuthenticated,
         isAwaitingSecondFactor: tokenIsAwaitingSecondFactor,
         isReady,
-        setTokenData,
-        setUserData,
-        signOut,
+        setTokenData: (_tokenData) => dispatch({ type: 'setTokenData', tokenData: _tokenData }),
+        setUserData: (_userData) => dispatch({ type: 'setUserData', userData: _userData }),
+        setAuthData: (authData) => dispatch({ type: 'setAuthData', ...authData }),
+        signOut: () => dispatch({ type: 'clearAuthData' }),
         tokenData,
         userData,
         userWasAutoSignedOut,

@@ -3,7 +3,6 @@ import {
   render,
   fireEvent,
 } from '@testing-library/react';
-import { authDataInLocalStorage } from './utils/setTestTokenInStorage';
 import AuthProvider from '.';
 import Context from './context';
 import useExtendTokenLifetime from './useExtendTokenLifetime';
@@ -11,7 +10,6 @@ import useApiClientSync from './useApiClientSync';
 import useIsUserAuthenticated from './useIsUserAuthenticated';
 import useLocalStorageSync from './useLocalStorageSync';
 import useSignOutSync from './useSignOutSync';
-import useAuthResponseCallback from './useAuthResponseCallback';
 import cancelAutoSignOutTimer from './useAutoSignOut/utils/cancelTimer';
 import resetAutoSignOutTimer from './useAutoSignOut/utils/resetTimer';
 import runAutoSignOutTimer from './useAutoSignOut/utils/runTimer';
@@ -30,7 +28,6 @@ jest.mock('./useApiClientSync', () => jest.fn());
 jest.mock('./useIsUserAuthenticated', () => jest.fn());
 jest.mock('./useLocalStorageSync', () => jest.fn());
 jest.mock('./useSignOutSync', () => jest.fn());
-jest.mock('./useAuthResponseCallback', () => jest.fn());
 jest.mock('./useAutoSignOut/utils/cancelTimer', () => jest.fn());
 jest.mock('./useAutoSignOut/utils/resetTimer', () => jest.fn());
 jest.mock('./useAutoSignOut/utils/runTimer', () => jest.fn());
@@ -45,7 +42,6 @@ describe('<AuthProvider />', () => {
     key: 'MOCK_TOKEN_KEY',
     status: TOKEN_STATUS_AWAITING_SECOND_FACTOR,
   };
-  const authResponseCallbackMock = () => {};
   let mockTokenData;
   let mockUserData;
   let container;
@@ -104,7 +100,6 @@ describe('<AuthProvider />', () => {
     afterEach(() => {
       cancelAutoSignOutTimer.mockReset();
       useApiClientSync.mockReset();
-      useAuthResponseCallback.mockReset().mockReturnValue(authResponseCallbackMock);
       useExtendTokenLifetime.mockReset();
       useIsUserAuthenticated.mockReset();
       useLocalStorageSync.mockReset();
@@ -145,12 +140,6 @@ describe('<AuthProvider />', () => {
       expect(useExtendTokenLifetime).toHaveBeenCalledTimes(2);
     });
 
-    it('calls useExtendTokenLifetime with tokenData, authResponseCallback, signOut', () => {
-      container.rerender(<AuthProvider />);
-
-      expect(useExtendTokenLifetime).toHaveBeenCalledWith(authDataInLocalStorage.tokenData, authResponseCallbackMock, expect.any(Function));
-    });
-
     it('calls useApiClientSync hook on every render', () => {
       container.rerender(<AuthProvider />);
 
@@ -167,18 +156,6 @@ describe('<AuthProvider />', () => {
       container.rerender(<AuthProvider />);
 
       expect(useLocalStorageSync).toHaveBeenCalledTimes(2);
-    });
-
-    it('calls useAuthResponseCallback hook on every render', () => {
-      container.rerender(<AuthProvider />);
-
-      expect(useAuthResponseCallback).toHaveBeenCalledTimes(2);
-    });
-
-    it('calls useAuthResponseCallback tokenData, userData, setTokenData and setUserData', () => {
-      container.rerender(<AuthProvider />);
-
-      expect(useAuthResponseCallback).toHaveBeenCalledWith(authDataInLocalStorage.tokenData, undefined, expect.any(Function), expect.any(Function));
     });
 
     it('calls useSignOutSync hook on every render', () => {
@@ -386,34 +363,6 @@ describe('<AuthProvider />', () => {
       it('does NOT render "Is not awaiting second factor" section', () => {
         expect(container.queryByText('Is not awaiting second factor')).toBeNull();
       });
-    });
-  });
-
-  describe.only('when useExtendTokenLifetime return true', () => {
-    beforeEach(() => {
-      useExtendTokenLifetime.mockReturnValue([true]);
-
-      container = render(
-        <AuthProvider>
-          <Context.Consumer>
-            {({ isReady }) => (
-              <>
-                {isReady === true && <section>Is ready</section>}
-                {isReady === false && <section>Is not ready</section>}
-              </>
-            )}
-          </Context.Consumer>
-        </AuthProvider>,
-      );
-      expect(container.container).toMatchSnapshot();
-    });
-
-    it('renders "Is ready" section', () => {
-      expect(container.queryByText('Is ready')).toBeTruthy();
-    });
-
-    it('does NOT render "Is not ready" section', () => {
-      expect(container.queryByText('Is not ready')).toBeNull();
     });
   });
 });

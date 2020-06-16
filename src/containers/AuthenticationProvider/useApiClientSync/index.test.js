@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
-import {
-  render,
-  fireEvent,
-} from '@testing-library/react';
+import React from 'react';
+import { render } from '@testing-library/react';
 import useApiClientSync from '.';
 import {
   removeAuthorizationTokenInHeaders,
@@ -52,8 +49,6 @@ describe('useApiClientSync', () => {
   });
 
   describe('when token is valid', () => {
-    let button;
-
     beforeEach(() => {
       container = render(<TestComponent mockedToken={validToken} />);
     });
@@ -69,8 +64,6 @@ describe('useApiClientSync', () => {
   });
 
   describe('when token is invalid', () => {
-    let button;
-
     beforeEach(() => {
       container = render(<TestComponent mockedToken={invalidToken} />);
     });
@@ -86,8 +79,6 @@ describe('useApiClientSync', () => {
   });
 
   describe('when token is null', () => {
-    let button;
-
     beforeEach(() => {
       container = render(<TestComponent mockedToken={null} />);
     });
@@ -103,8 +94,6 @@ describe('useApiClientSync', () => {
   });
 
   describe('when token is awaiting second factor', () => {
-    let button;
-
     beforeEach(() => {
       container = render(<TestComponent mockedToken={awaitingSecondFactorToken} />);
     });
