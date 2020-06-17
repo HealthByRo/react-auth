@@ -8,7 +8,7 @@ export default function useAuthReducer() {
   const [state, dispatch] = useReducer(reducer, {
     isReady: false,
     userWasAutoSignedOut: false,
-    tokenData: (authDataInLocalStorage && authDataInLocalStorage.tokenData) || undefined,
+    tokenData: authDataInLocalStorage?.tokenData || undefined,
   });
 
   return [state, dispatch];

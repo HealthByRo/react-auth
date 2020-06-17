@@ -43,7 +43,7 @@ export default function useExtendTokenLifetime(tokenData, onSuccess, onFailure, 
       }
     } else {
       processingRef.current = false;
-      onSuccess({});
+      onSuccess();
     }
 
     return () => {

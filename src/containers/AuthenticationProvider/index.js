@@ -21,15 +21,28 @@ export default function AuthProvider(props) {
   }, dispatch] = useAuthReducer();
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
   const tokenIsAwaitingSecondFactor = isTokenAwaitingSecondFactor(tokenData);
+  const clearAuthData = () => dispatch({ type: 'clearAuthData' });
+  const setAuthData = (authData) => dispatch({ type: 'setAuthData', ...authData });
+  const setIsReady = (_isReady) => dispatch({ type: 'setIsReady', isReady: _isReady });
+  const setTokenData = (_tokenData) => dispatch({ type: 'setTokenData', tokenData: _tokenData });
+  const setUserData = (_userData) => dispatch({ type: 'setUserData', userData: _userData });
+  const setUserWasAutoSignedOut = (_userWasAutoSignedOut) => dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut: _userWasAutoSignedOut });
 
-  useExtendTokenLifetime(tokenData, (responseData) => {
-    dispatch({ type: 'setAuthData', ...responseData });
-  }, () => {
-    dispatch({ type: 'clearAuthData' });
-  }, isReady);
-  useIsUserAuthenticated(userIsAuthenticated, () => {
-    dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut: false });
-  });
+  const onExtendTokenLifeTimeSuccess = (authData) => {
+    if (authData) {
+      setAuthData(authData);
+    } else {
+      setIsReady(true);
+    }
+  };
+  const onAuthenticationSuccess = () => setUserWasAutoSignedOut(false);
+  const onAutoSignoutSuccess = () => {
+    setUserWasAutoSignedOut(true);
+    clearAuthData();
+  };
+
+  useExtendTokenLifetime(tokenData, onExtendTokenLifeTimeSuccess, clearAuthData, isReady);
+  useIsUserAuthenticated(userIsAuthenticated, onAuthenticationSuccess);
   useLocalStorageSync(tokenData, userData);
 
   // order of hooks is important
@@ -37,11 +50,7 @@ export default function AuthProvider(props) {
   // useSignOutSync must send request to server, which requires auth token
   useSignOutSync(userIsAuthenticated);
   useApiClientSync(tokenData);
-
-  useAutoSignOut(userIsAuthenticated, () => {
-    dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut: true });
-    dispatch({ type: 'clearAuthData' });
-  });
+  useAutoSignOut(userIsAuthenticated, onAutoSignoutSuccess);
   useDebugValue(userIsAuthenticated ? 'Authenticated' : 'Not authenticated');
 
   return (
@@ -50,10 +59,10 @@ export default function AuthProvider(props) {
         isAuthenticated: userIsAuthenticated,
         isAwaitingSecondFactor: tokenIsAwaitingSecondFactor,
         isReady,
-        setTokenData: (_tokenData) => dispatch({ type: 'setTokenData', tokenData: _tokenData }),
-        setUserData: (_userData) => dispatch({ type: 'setUserData', userData: _userData }),
-        setAuthData: (authData) => dispatch({ type: 'setAuthData', ...authData }),
-        signOut: () => dispatch({ type: 'clearAuthData' }),
+        setTokenData,
+        setUserData,
+        setAuthData,
+        signOut: clearAuthData,
         tokenData,
         userData,
         userWasAutoSignedOut,
