@@ -18,15 +18,16 @@ export default function AuthProvider(props) {
     userData,
     isReady,
     userWasAutoSignedOut,
-  }, dispatch] = useAuthReducer();
+  }, {
+    clearAuthData,
+    setAuthData,
+    setIsReady,
+    setTokenData,
+    setUserData,
+    setUserWasAutoSignedOut,
+  }] = useAuthReducer();
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
   const tokenIsAwaitingSecondFactor = isTokenAwaitingSecondFactor(tokenData);
-  const clearAuthData = () => dispatch({ type: 'clearAuthData' });
-  const setAuthData = (authData) => dispatch({ type: 'setAuthData', ...authData });
-  const setIsReady = (_isReady) => dispatch({ type: 'setIsReady', isReady: _isReady });
-  const setTokenData = (_tokenData) => dispatch({ type: 'setTokenData', tokenData: _tokenData });
-  const setUserData = (_userData) => dispatch({ type: 'setUserData', userData: _userData });
-  const setUserWasAutoSignedOut = (_userWasAutoSignedOut) => dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut: _userWasAutoSignedOut });
 
   const onExtendTokenLifeTimeSuccess = (authData) => {
     if (authData) {

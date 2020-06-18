@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useReducer, useMemo } from 'react';
 import getAuthDataFromStorage from '../utils/getAuthDataFromStorage';
 import reducer from './reducer';
 
@@ -11,5 +11,14 @@ export default function useAuthReducer() {
     tokenData: authDataInLocalStorage?.tokenData || undefined,
   });
 
-  return [state, dispatch];
+  const actions = useMemo(() => ({
+    clearAuthData: () => dispatch({ type: 'clearAuthData' }),
+    setAuthData: (authData) => dispatch({ type: 'setAuthData', ...authData }),
+    setIsReady: (isReady) => dispatch({ type: 'setIsReady', isReady }),
+    setTokenData: (tokenData) => dispatch({ type: 'setTokenData', tokenData }),
+    setUserData: (userData) => dispatch({ type: 'setUserData', userData }),
+    setUserWasAutoSignedOut: (userWasAutoSignedOut) => dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut }),
+  }), []);
+
+  return [state, actions];
 }
