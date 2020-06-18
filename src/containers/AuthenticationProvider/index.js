@@ -11,6 +11,7 @@ import useAutoSignOut from './useAutoSignOut';
 import useIsUserAuthenticated from './useIsUserAuthenticated';
 import useSignOutSync from './useSignOutSync';
 import useAuthReducer from './useAuthReducer';
+import getUserLastToken from './utils/getUserLastToken';
 
 export default function AuthProvider(props) {
   const [{
@@ -64,6 +65,7 @@ export default function AuthProvider(props) {
         setUserData,
         setAuthData,
         signOut: clearAuthData,
+        getUserLastToken,
         tokenData,
         userData,
         userWasAutoSignedOut,
