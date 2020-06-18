@@ -11,7 +11,7 @@ import useAutoSignOut from './useAutoSignOut';
 import useIsUserAuthenticated from './useIsUserAuthenticated';
 import useSignOutSync from './useSignOutSync';
 import useAuthReducer from './useAuthReducer';
-import getUserLastToken from './utils/getUserLastToken';
+import getLastTokenByEmail from './utils/getLastTokenByEmail';
 import debounce from './utils/debounce';
 
 export default function AuthProvider(props) {
@@ -66,7 +66,7 @@ export default function AuthProvider(props) {
         setUserData,
         setAuthData,
         signOut: clearAuthData,
-        getUserLastToken,
+        getLastTokenByEmail,
         tokenData,
         userData,
         userWasAutoSignedOut,
