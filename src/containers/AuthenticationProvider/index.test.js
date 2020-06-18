@@ -3,6 +3,9 @@ import {
   render,
   fireEvent,
 } from '@testing-library/react';
+import {
+  fireEvent as fireDomEvent,
+} from '@testing-library/dom';
 import AuthProvider from '.';
 import Context from './context';
 import useExtendTokenLifetime from './useExtendTokenLifetime';
@@ -32,6 +35,10 @@ jest.mock('./useAutoSignOut/utils/cancelTimer', () => jest.fn());
 jest.mock('./useAutoSignOut/utils/resetTimer', () => jest.fn());
 jest.mock('./useAutoSignOut/utils/runTimer', () => jest.fn());
 jest.mock('./useAutoSignOut/utils/setLastActive', () => jest.fn());
+
+jest.useFakeTimers();
+
+const timeAfterDebouncedActivity = 301;
 
 describe('<AuthProvider />', () => {
   const mockValidTokenData = {
@@ -288,11 +295,14 @@ describe('<AuthProvider />', () => {
         describe('when click on a wrapper or key press', () => {
           beforeEach(() => {
             resetAutoSignOutTimer.mockReset();
+            jest.clearAllTimers();
 
             fireEvent.click(container.container.firstChild);
           });
 
           it('calls resetAutoSignOutTimer when click on main wrapper', () => {
+            jest.advanceTimersByTime(timeAfterDebouncedActivity);
+
             container.rerender(<AuthProvider />);
 
             expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(1);
@@ -310,6 +320,8 @@ describe('<AuthProvider />', () => {
 
             fireEvent.click(someBtn);
 
+            jest.advanceTimersByTime(timeAfterDebouncedActivity);
+
             expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(2);
           });
 
@@ -322,6 +334,27 @@ describe('<AuthProvider />', () => {
             const textarea = container.container.querySelector('textarea');
 
             fireEvent.keyPress(textarea, { key: 'A', code: 65, charCode: 65 });
+
+            jest.advanceTimersByTime(timeAfterDebouncedActivity);
+
+            expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(2);
+          });
+
+          it('calls resetAutoSignOutTimer one more time when mouse is moved', () => {
+            container.rerender(
+              <AuthProvider>
+                <textarea />
+              </AuthProvider>
+            );
+            const textarea = container.container.querySelector('textarea');
+            const mouseTraveldistance = 10;
+
+            // eslint-disable-next-line no-plusplus
+            for (let i = 0; i < mouseTraveldistance; i++) {
+              fireDomEvent.mouseMove(textarea);
+            }
+
+            jest.advanceTimersByTime(timeAfterDebouncedActivity);
 
             expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(2);
           });

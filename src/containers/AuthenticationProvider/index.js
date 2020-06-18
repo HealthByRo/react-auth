@@ -12,6 +12,7 @@ import useIsUserAuthenticated from './useIsUserAuthenticated';
 import useSignOutSync from './useSignOutSync';
 import useAuthReducer from './useAuthReducer';
 import getUserLastToken from './utils/getUserLastToken';
+import debounce from './utils/debounce';
 
 export default function AuthProvider(props) {
   const [{
@@ -29,7 +30,7 @@ export default function AuthProvider(props) {
   }] = useAuthReducer();
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
   const tokenIsAwaitingSecondFactor = isTokenAwaitingSecondFactor(tokenData);
-
+  const handleActivity = debounce(resetAutoSignOutTimer, 300);
   const onExtendTokenLifeTimeSuccess = (authData) => {
     if (authData) {
       setAuthData(authData);
@@ -72,8 +73,9 @@ export default function AuthProvider(props) {
       }}
     >
       <div
-        onClick={resetAutoSignOutTimer}
-        onKeyPress={resetAutoSignOutTimer}
+        onClick={handleActivity}
+        onKeyPress={handleActivity}
+        onMouseMove={handleActivity}
         role="button"
         tabIndex="0"
       >
