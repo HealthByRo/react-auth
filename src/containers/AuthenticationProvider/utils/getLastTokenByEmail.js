@@ -2,10 +2,6 @@ import getAuthDataFromStorage from './getAuthDataFromStorage';
 import generateLastUserTokenKey from './generateLastUserTokenKey';
 
 export default function getLastTokenByEmail(email) {
-  if (!email) {
-    return undefined;
-  }
-
   const store = getAuthDataFromStorage();
   const lastUserTokenKey = generateLastUserTokenKey(email);
 
