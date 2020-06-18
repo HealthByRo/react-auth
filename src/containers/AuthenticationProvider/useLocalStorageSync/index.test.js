@@ -167,8 +167,8 @@ describe('processAuthResponse', () => {
           fireEvent.click(button);
         });
 
-        it('auth data in localStorage is undefined', () => {
-          expect(getAuthDataFromStorage()).toBeUndefined();
+        it('auth data in localStorage is defined, tokenData is cleared', () => {
+          expect(getAuthDataFromStorage().tokenData).toBeNull();
         });
 
         it('auth data saved in localStorage match snapshot', () => {
@@ -190,8 +190,8 @@ describe('processAuthResponse', () => {
       fireEvent.click(button);
     });
 
-    it('auth data saved in localStorage is empty undefined', () => {
-      expect(getAuthDataFromStorage()).toBeUndefined();
+    it('user data saved in localStorage is empty undefined', () => {
+      expect(getAuthDataFromStorage().userData).toBeUndefined();
     });
   });
 });
