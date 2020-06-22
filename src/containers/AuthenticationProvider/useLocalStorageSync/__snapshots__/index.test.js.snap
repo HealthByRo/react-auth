@@ -37,4 +37,11 @@ Object {
 }
 `;
 
-exports[`processAuthResponse when clicks on "Set token data" button which set mocked token data when clicks on "Set user data" button which set mocked user data when clicks on "Set token data" button which set null (it means user logout) auth data saved in localStorage match snapshot 1`] = `undefined`;
+exports[`processAuthResponse when clicks on "Set token data" button which set mocked token data when clicks on "Set user data" button which set mocked user data when clicks on "Set token data" button which set null (it means user logout) auth data saved in localStorage match snapshot 1`] = `
+Object {
+  "lastTokens": Object {
+    "227abe90793934fc2588650db74319b7": "TEST_TOKEN",
+  },
+  "tokenData": null,
+}
+`;

@@ -11,6 +11,8 @@ import useAutoSignOut from './useAutoSignOut';
 import useIsUserAuthenticated from './useIsUserAuthenticated';
 import useSignOutSync from './useSignOutSync';
 import useAuthReducer from './useAuthReducer';
+import getLastTokenByEmail from './utils/getLastTokenByEmail';
+import debounce from './utils/debounce';
 
 export default function AuthProvider(props) {
   const [{
@@ -18,16 +20,17 @@ export default function AuthProvider(props) {
     userData,
     isReady,
     userWasAutoSignedOut,
-  }, dispatch] = useAuthReducer();
+  }, {
+    clearAuthData,
+    setAuthData,
+    setIsReady,
+    setTokenData,
+    setUserData,
+    setUserWasAutoSignedOut,
+  }] = useAuthReducer();
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
   const tokenIsAwaitingSecondFactor = isTokenAwaitingSecondFactor(tokenData);
-  const clearAuthData = () => dispatch({ type: 'clearAuthData' });
-  const setAuthData = (authData) => dispatch({ type: 'setAuthData', ...authData });
-  const setIsReady = (_isReady) => dispatch({ type: 'setIsReady', isReady: _isReady });
-  const setTokenData = (_tokenData) => dispatch({ type: 'setTokenData', tokenData: _tokenData });
-  const setUserData = (_userData) => dispatch({ type: 'setUserData', userData: _userData });
-  const setUserWasAutoSignedOut = (_userWasAutoSignedOut) => dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut: _userWasAutoSignedOut });
-
+  const handleActivity = debounce(resetAutoSignOutTimer, 300);
   const onExtendTokenLifeTimeSuccess = (authData) => {
     if (authData) {
       setAuthData(authData);
@@ -63,14 +66,16 @@ export default function AuthProvider(props) {
         setUserData,
         setAuthData,
         signOut: clearAuthData,
+        getLastTokenByEmail,
         tokenData,
         userData,
         userWasAutoSignedOut,
       }}
     >
       <div
-        onClick={resetAutoSignOutTimer}
-        onKeyPress={resetAutoSignOutTimer}
+        onClick={handleActivity}
+        onKeyPress={handleActivity}
+        onMouseMove={handleActivity}
         role="button"
         tabIndex="0"
       >
