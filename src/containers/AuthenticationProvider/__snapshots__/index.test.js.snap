@@ -120,29 +120,3 @@ Object {
   "unmount": [Function],
 }
 `;
-
-exports[`<AuthProvider /> when useExtendTokenLifetime return true does NOT render "Is not ready" section 1`] = `
-<div>
-  <div
-    role="button"
-    tabindex="0"
-  >
-    <section>
-      Is ready
-    </section>
-  </div>
-</div>
-`;
-
-exports[`<AuthProvider /> when useExtendTokenLifetime return true renders "Is ready" section 1`] = `
-<div>
-  <div
-    role="button"
-    tabindex="0"
-  >
-    <section>
-      Is ready
-    </section>
-  </div>
-</div>
-`;
