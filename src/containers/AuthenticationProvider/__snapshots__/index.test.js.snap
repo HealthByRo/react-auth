@@ -5,42 +5,6 @@ Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
-      <div
-        role="button"
-        tabindex="0"
-      >
-        <section>
-          Is not ready
-        </section>
-        <section>
-          Is not authenticated
-        </section>
-        <section>
-          Is not awaiting second factor
-        </section>
-        <button
-          type="button"
-        >
-          Set user data
-        </button>
-        <button
-          type="button"
-        >
-          Set token data
-        </button>
-        <button
-          type="button"
-        >
-          Sign out
-        </button>
-      </div>
-    </div>
-  </body>,
-  "container": <div>
-    <div
-      role="button"
-      tabindex="0"
-    >
       <section>
         Is not ready
       </section>
@@ -66,6 +30,32 @@ Object {
         Sign out
       </button>
     </div>
+  </body>,
+  "container": <div>
+    <section>
+      Is not ready
+    </section>
+    <section>
+      Is not authenticated
+    </section>
+    <section>
+      Is not awaiting second factor
+    </section>
+    <button
+      type="button"
+    >
+      Set user data
+    </button>
+    <button
+      type="button"
+    >
+      Set token data
+    </button>
+    <button
+      type="button"
+    >
+      Sign out
+    </button>
   </div>,
   "debug": [Function],
   "findAllByAltText": [Function],
