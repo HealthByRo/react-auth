@@ -35,6 +35,7 @@ export default function reducer(state, action) {
         ...state,
         userData: null,
         tokenData: null,
+        featureFlags: new Set([]),
         userWasAutoSignedOut: action.userWasAutoSignedOut,
       };
     case 'setUserWasAutoSignedOut':
