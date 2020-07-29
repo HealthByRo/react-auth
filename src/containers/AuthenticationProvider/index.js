@@ -69,7 +69,7 @@ export default function AuthProvider(props) {
       window.removeEventListener('keypress', handleActivity);
       window.removeEventListener('mousemove', handleActivity);
     };
-  });
+  }, []);
 
   return (
     <Context.Provider

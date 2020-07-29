@@ -27,6 +27,11 @@ Object {
       <button
         type="button"
       >
+        Set feature flags
+      </button>
+      <button
+        type="button"
+      >
         Sign out
       </button>
     </div>
@@ -50,6 +55,11 @@ Object {
       type="button"
     >
       Set token data
+    </button>
+    <button
+      type="button"
+    >
+      Set feature flags
     </button>
     <button
       type="button"
