@@ -17,6 +17,7 @@ export default function reducer(state, action) {
           isReady: true,
           userData: action.userData,
           tokenData: action.tokenData,
+          featureFlags: new Set(action.featureFlags || []),
         };
       }
 
@@ -34,12 +35,18 @@ export default function reducer(state, action) {
         ...state,
         userData: null,
         tokenData: null,
+        featureFlags: new Set([]),
         userWasAutoSignedOut: action.userWasAutoSignedOut,
       };
     case 'setUserWasAutoSignedOut':
       return {
         ...state,
         userWasAutoSignedOut: action.userWasAutoSignedOut,
+      };
+    case 'setFeatureFlags':
+      return {
+        ...state,
+        featureFlags: new Set(action.featureFlags),
       };
     default:
       throw new Error();
