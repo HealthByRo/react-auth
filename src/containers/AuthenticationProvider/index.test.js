@@ -51,6 +51,7 @@ describe('<AuthProvider />', () => {
   };
   let mockTokenData;
   let mockUserData;
+  let mockFeatureFlags;
   let container;
 
   describe.only('when useExtendTokenLifetime return false', () => {
@@ -64,8 +65,10 @@ describe('<AuthProvider />', () => {
               isAuthenticated,
               isAwaitingSecondFactor,
               isReady,
+              featureFlags,
               setTokenData,
               setUserData,
+              setFeatureFlags,
               signOut,
               userWasAutoSignedOut,
             }) => (
@@ -77,6 +80,9 @@ describe('<AuthProvider />', () => {
                 {isAwaitingSecondFactor === true && <section>Is awaiting second factor</section>}
                 {isAwaitingSecondFactor === false && <section>Is not awaiting second factor</section>}
                 {userWasAutoSignedOut === true && <section>User was auto signed out</section>}
+                {featureFlags.size > 0 && (
+                  <section>{`Active feature flags: ${[...featureFlags].join(', ')}.`}</section>
+                )}
                 <button
                   type="button"
                   onClick={() => setUserData(mockUserData)}
@@ -89,6 +95,13 @@ describe('<AuthProvider />', () => {
                   onClick={() => setTokenData(mockTokenData)}
                 >
                   Set token data
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFeatureFlags(mockFeatureFlags)}
+                >
+                  Set feature flags
                 </button>
 
                 <button
@@ -292,20 +305,10 @@ describe('<AuthProvider />', () => {
           });
         });
 
-        describe('when click on a wrapper or key press', () => {
+        describe('when click or key press', () => {
           beforeEach(() => {
             resetAutoSignOutTimer.mockReset();
             jest.clearAllTimers();
-
-            fireEvent.click(container.container.firstChild);
-          });
-
-          it('calls resetAutoSignOutTimer when click on main wrapper', () => {
-            jest.advanceTimersByTime(timeAfterDebouncedActivity);
-
-            container.rerender(<AuthProvider />);
-
-            expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(1);
           });
 
           it('calls resetAutoSignOutTimer one more time when click on any other element eg. "Some button"', () => {
@@ -322,7 +325,7 @@ describe('<AuthProvider />', () => {
 
             jest.advanceTimersByTime(timeAfterDebouncedActivity);
 
-            expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(2);
+            expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(1);
           });
 
           it('calls resetAutoSignOutTimer one more time when key press', () => {
@@ -337,7 +340,7 @@ describe('<AuthProvider />', () => {
 
             jest.advanceTimersByTime(timeAfterDebouncedActivity);
 
-            expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(2);
+            expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(1);
           });
 
           it('calls resetAutoSignOutTimer one more time when mouse is moved', () => {
@@ -356,7 +359,7 @@ describe('<AuthProvider />', () => {
 
             jest.advanceTimersByTime(timeAfterDebouncedActivity);
 
-            expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(2);
+            expect(resetAutoSignOutTimer).toHaveBeenCalledTimes(1);
           });
         });
       });
@@ -377,6 +380,20 @@ describe('<AuthProvider />', () => {
 
       it('does NOT render "Is authenticated" section', () => {
         expect(container.queryByText('Is authenticated')).toBeNull();
+      });
+    });
+
+    describe('when click on "Set feature flags" button to set mocked feature flags', () => {
+      beforeEach(() => {
+        mockFeatureFlags = ['test1', 'test2'];
+
+        const setFeatureFlagsBtn = container.queryByText('Set feature flags');
+
+        fireEvent.click(setFeatureFlagsBtn);
+      });
+
+      it('renders "Active feature flags" section', () => {
+        expect(container.queryByText('Active feature flags: test1, test2.')).toBeTruthy();
       });
     });
 

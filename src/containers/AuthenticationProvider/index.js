@@ -1,4 +1,4 @@
-import React, { useDebugValue } from 'react';
+import React, { useDebugValue, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Context from './context';
 import isAuthenticated from './utils/isAuthenticated';
@@ -16,6 +16,7 @@ import debounce from './utils/debounce';
 
 export default function AuthProvider(props) {
   const [{
+    featureFlags,
     tokenData,
     userData,
     isReady,
@@ -26,6 +27,7 @@ export default function AuthProvider(props) {
     setIsReady,
     setTokenData,
     setUserData,
+    setFeatureFlags,
     setUserWasAutoSignedOut,
   }] = useAuthReducer();
   const userIsAuthenticated = isAuthenticated(tokenData, userData);
@@ -56,6 +58,19 @@ export default function AuthProvider(props) {
   useAutoSignOut(userIsAuthenticated, onAutoSignoutSuccess);
   useDebugValue(userIsAuthenticated ? 'Authenticated' : 'Not authenticated');
 
+  // Register event listeners on the window for activity tracking
+  useEffect(() => {
+    window.addEventListener('click', handleActivity);
+    window.addEventListener('keypress', handleActivity);
+    window.addEventListener('mousemove', handleActivity);
+
+    return () => {
+      window.removeEventListener('click', handleActivity);
+      window.removeEventListener('keypress', handleActivity);
+      window.removeEventListener('mousemove', handleActivity);
+    };
+  }, []);
+
   return (
     <Context.Provider
       value={{
@@ -65,22 +80,16 @@ export default function AuthProvider(props) {
         setTokenData,
         setUserData,
         setAuthData,
+        setFeatureFlags,
         signOut: clearAuthData,
         getLastTokenByEmail,
         tokenData,
         userData,
+        featureFlags,
         userWasAutoSignedOut,
       }}
     >
-      <div
-        onClick={handleActivity}
-        onKeyPress={handleActivity}
-        onMouseMove={handleActivity}
-        role="button"
-        tabIndex="0"
-      >
-        {props.children}
-      </div>
+      {props.children}
     </Context.Provider>
   );
 }

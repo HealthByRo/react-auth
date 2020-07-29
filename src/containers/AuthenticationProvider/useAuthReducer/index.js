@@ -9,6 +9,7 @@ export default function useAuthReducer() {
     isReady: false,
     userWasAutoSignedOut: false,
     tokenData: authDataInLocalStorage?.tokenData || undefined,
+    featureFlags: new Set([]),
   });
 
   const actions = useMemo(() => ({
@@ -17,6 +18,7 @@ export default function useAuthReducer() {
     setIsReady: (isReady) => dispatch({ type: 'setIsReady', isReady }),
     setTokenData: (tokenData) => dispatch({ type: 'setTokenData', tokenData }),
     setUserData: (userData) => dispatch({ type: 'setUserData', userData }),
+    setFeatureFlags: (featureFlags) => dispatch({ type: 'setFeatureFlags', featureFlags }),
     setUserWasAutoSignedOut: (userWasAutoSignedOut) => dispatch({ type: 'setUserWasAutoSignedOut', userWasAutoSignedOut }),
   }), []);
 
