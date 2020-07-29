@@ -1,6 +1,6 @@
 {
   "name": "@ro/react-auth",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Set of authentication components and containers such as: Sign In, Sign Up, Sign Out, Reset Password, authorization wrappers",
   "repository": "github:HealthByRo/react-auth",
   "author": "Ro Front-End Team <team@arabel.la>",
